@@ -7,7 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Dimensions
+  Dimensions,
+  SafeAreaView,
+  StatusBar,
+  Keyboard,
+  TouchableWithoutFeedback 
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
@@ -88,86 +92,91 @@ const App = () => {
   const chartConfig = {
     backgroundGradientFrom: '#fff',
     backgroundGradientTo: '#fff',
-    decimalPlaces: 2, // Два знака после запятой
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Цвет подписей оси X и оси Y
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Цвет меток
+    decimalPlaces: 2,
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     propsForDots: {
       r: '6',
       strokeWidth: '2',
-      stroke: '#ffa726', // Цвет точек
+      stroke: '#ffa726',
     },
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
-      <Text style={styles.title}>Управление финансами</Text>
-      <View style={styles.balanceContainer}>
-        <Text style={styles.balanceLabel}>Текущий баланс:</Text>
-        <Text style={styles.balanceAmount}>{balance.toFixed(2)} ₽</Text>
-      </View>
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'all' && styles.activeFilter]}
-          onPress={() => setFilter('all')}>
-          <Text style={[styles.filterText, filter === 'all' && styles.activeFilterText]}>Все</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'income' && styles.activeFilter]}
-          onPress={() => setFilter('income')}>
-          <Text style={[styles.filterText, filter === 'income' && styles.activeFilterText]}>Доходы</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, filter === 'expense' && styles.activeFilter]}
-          onPress={() => setFilter('expense')}>
-          <Text style={[styles.filterText, filter === 'expense' && styles.activeFilterText]}>Расходы</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Описание транзакции"
-          value={newTransactionDescription}
-          onChangeText={text => setNewTransactionDescription(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Сумма"
-          keyboardType="numeric"
-          value={newTransactionAmount}
-          onChangeText={text => setNewTransactionAmount(text)}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addTransaction}>
-          <Text style={styles.addButtonText}>Добавить транзакцию</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.summaryContainer}>
-        <Text style={styles.summaryLabel}>
-          Доходы: {incomeTransactions.reduce((total, transaction) => total + transaction.amount, 0).toFixed(2)}
-        </Text>
-        <Text style={styles.summaryLabel}>
-          Расходы: {expenseTransactions.reduce((total, transaction) => total + transaction.amount, 0).toFixed(2)}
-        </Text>
-      </View>
-      <View style={styles.chartContainer}>
-        <LineChart
-          data={chartData}
-          width={Dimensions.get('window').width - 40} // ширина графика = ширина экрана - 40 (для отступов)
-          height={220}
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
-      </View>
-      <FlatList
-        data={filteredTransactions()}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.transaction}>
-            <Text style={styles.transactionDescription}>{item.description}</Text>
-            <Text style={styles.transactionAmount}>{item.amount.toFixed(2)}</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar></StatusBar>
+        <KeyboardAvoidingView style={styles.container} behavior="padding">
+          <Text style={styles.title}>Управление финансами</Text>
+          <View style={styles.balanceContainer}>
+            <Text style={styles.balanceLabel}>Текущий баланс:</Text>
+            <Text style={styles.balanceAmount}>{balance.toFixed(2)} ₽</Text>
           </View>
-        )}
-      />
-    </KeyboardAvoidingView>
+          <View style={styles.filterContainer}>
+            <TouchableOpacity
+              style={[styles.filterButton, filter === 'all' && styles.activeFilter]}
+              onPress={() => setFilter('all')}>
+              <Text style={[styles.filterText, filter === 'all' && styles.activeFilterText]}>Все</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterButton, filter === 'income' && styles.activeFilter]}
+              onPress={() => setFilter('income')}>
+              <Text style={[styles.filterText, filter === 'income' && styles.activeFilterText]}>Доходы</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterButton, filter === 'expense' && styles.activeFilter]}
+              onPress={() => setFilter('expense')}>
+              <Text style={[styles.filterText, filter === 'expense' && styles.activeFilterText]}>Расходы</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Описание транзакции"
+              value={newTransactionDescription}
+              onChangeText={text => setNewTransactionDescription(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Сумма"
+              keyboardType="numeric"
+              value={newTransactionAmount}
+              onChangeText={text => setNewTransactionAmount(text)}
+            />
+            <TouchableOpacity style={styles.addButton} onPress={addTransaction}>
+              <Text style={styles.addButtonText}>Добавить транзакцию</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.summaryContainer}>
+            <Text style={styles.summaryLabel}>
+              Доходы: {incomeTransactions.reduce((total, transaction) => total + transaction.amount, 0).toFixed(2)}
+            </Text>
+            <Text style={styles.summaryLabel}>
+              Расходы: {expenseTransactions.reduce((total, transaction) => total + transaction.amount, 0).toFixed(2)}
+            </Text>
+          </View>
+          <View style={styles.chartContainer}>
+            <LineChart
+              data={chartData}
+              width={Dimensions.get('window').width - 40} // ширина графика = ширина экрана - 40 (для отступов)
+              height={220}
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+          </View>
+          <FlatList
+            data={filteredTransactions()}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.transaction}>
+                <Text style={styles.transactionDescription}>{item.description}</Text>
+                <Text style={styles.transactionAmount}>{item.amount.toFixed(2)}</Text>
+              </View>
+            )}
+          />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
